@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: additional-scrape-configs
+  name: additional-scrape-configs-prom
   namespace: prometheus
 type: Opaque
 stringData:
