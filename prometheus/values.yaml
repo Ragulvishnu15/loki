@@ -204,14 +204,7 @@ server:
   #   ...
   #
   sidecarTemplateValues: {}
-  alertmanagers:
-    - static_configs:
-        - targets:
-            - alert-alertmanager.alert.svc.cluster.local:9093
-      scheme: http
-      path_prefix: /
-      timeout: 10s
-      api_version: v2
+  
 
   ## Prometheus server container image
   ##
