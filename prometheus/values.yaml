@@ -830,25 +830,26 @@ serverFiles:
   recording_rules.yml: {}
   ## DEPRECATED DEFAULT VALUE, unless explicitly naming your files, please use recording_rules.yml
   #rules: {}
-
+ 
   prometheus.yml:
+    global:
+      scrape_interval: 1m
+      evaluation_interval: 1m
+
+    alerting:
+      alertmanagers:
+        - scheme: http
+          static_configs:
+            - targets: ["alertmanager.alert.svc.cluster.local:9093"]
+
     rule_files:
       - /etc/config/rules/node-alerts.yaml
       - /etc/config/rules/pod-alerts.yaml
       - /etc/config/rules/cluster-alerts.yaml
       - /etc/config/rules/jenkins-alerts.yaml
       - /etc/config/recording_rules.yml
-      - /etc/config/alerting_rules.yml 
+      - /etc/config/alerting_rules.yml
 
-    ## Below two files are DEPRECATED will be removed from this default values file
-    
-    # Add Alertmanager configuration
-    alerting:
-      alertmanagers:
-      - scheme: http
-        static_configs:
-        - targets: ['alert-alertmanager.alert.svc.cluster.local:9093']
-    
     scrape_configs:
       - job_name: 'argocd'
         static_configs:
@@ -857,12 +858,12 @@ serverFiles:
       - job_name: prometheus
         static_configs:
           - targets:
-            - localhost:9090
-            
+              - localhost:9090
+
       - job_name: 'pushgateway'
         static_configs:
           - targets:
-            - prometheus-prometheus-pushgateway.prometheus.svc.cluster.local:9091
+              - prometheus-prometheus-pushgateway.prometheus.svc.cluster.local:9091
 
       - job_name: 'vault'
         metrics_path: '/v1/sys/metrics'
