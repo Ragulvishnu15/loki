@@ -130,17 +130,13 @@ configmapReload:
     resources: {}
 
 server:
-  additionalScrapeConfigsSecret: additional-scrape-configs
-
-  extraVolumes:
-    - name: additional-scrape-configs
-      secret:
-        secretName: additional-scrape-configs
-
-  extraVolumeMounts:
-    - name: additional-scrape-configs
-      mountPath: /etc/prometheus/additional-scrape-configs
-      readOnly: true
+  thanos:
+    enabled: true
+    image: quay.io/thanos/thanos
+    tag: v0.37.0
+    objectStorageConfig:
+      secretName: thanos-objstore-config
+      secretKey: objstore.yml 
 
 
   # (other server settings, like persistence, retention, etc.)
@@ -204,7 +200,14 @@ server:
   #   ...
   #
   sidecarTemplateValues: {}
-  
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - alert-alertmanager.alert.svc.cluster.local:9093
+      scheme: http
+      path_prefix: /
+      timeout: 10s
+      api_version: v2
 
   ## Prometheus server container image
   ##
@@ -753,7 +756,7 @@ server:
 
     ## Enable gRPC port on service to allow auto discovery with thanos-querier
     gRPC:
-      enabled: false
+      enabled: true
       servicePort: 10901
       # nodePort: 10901
 
@@ -817,32 +820,31 @@ serverFiles:
   #           summary: 'Instance {{ $labels.instance }} down'
   ## DEPRECATED DEFAULT VALUE, unless explicitly naming your files, please use alerting_rules.yml
   #alerts: {}
- 
+
   ## Records configuration
   ## Ref: https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/
   recording_rules.yml: {}
   ## DEPRECATED DEFAULT VALUE, unless explicitly naming your files, please use recording_rules.yml
   #rules: {}
- 
+
   prometheus.yml:
-    global:
-      scrape_interval: 1m
-      evaluation_interval: 1m
-
-    alerting:
-      alertmanagers:
-        - scheme: http
-          static_configs:
-            - targets: ["alertmanager.alert.svc.cluster.local:9093"]
-
     rule_files:
       - /etc/config/rules/node-alerts.yaml
       - /etc/config/rules/pod-alerts.yaml
       - /etc/config/rules/cluster-alerts.yaml
       - /etc/config/rules/jenkins-alerts.yaml
       - /etc/config/recording_rules.yml
-      - /etc/config/alerting_rules.yml
+      - /etc/config/alerting_rules.yml 
 
+    ## Below two files are DEPRECATED will be removed from this default values file
+    
+    # Add Alertmanager configuration
+    alerting:
+      alertmanagers:
+      - scheme: http
+        static_configs:
+        - targets: ['alert-alertmanager.alert.svc.cluster.local:9093']
+    
     scrape_configs:
       - job_name: 'argocd'
         static_configs:
@@ -851,12 +853,12 @@ serverFiles:
       - job_name: prometheus
         static_configs:
           - targets:
-              - localhost:9090
-
+            - localhost:9090
+            
       - job_name: 'pushgateway'
         static_configs:
           - targets:
-              - prometheus-prometheus-pushgateway.prometheus.svc.cluster.local:9091
+            - prometheus-prometheus-pushgateway.prometheus.svc.cluster.local:9091
 
       - job_name: 'vault'
         metrics_path: '/v1/sys/metrics'
