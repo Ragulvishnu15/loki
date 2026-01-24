@@ -287,7 +287,8 @@ configAnnotations: {}
   # vault.security.banzaicloud.io/vault-path: "kubernetes"
   ## Example for inject secret
   # slack_api_url: '${vault:secret/data/slack-hook-alerts#URL}'
-
+secret:
+  smtpAuthPassword: "your-app-password"
 config:
   enabled: true
   global:
