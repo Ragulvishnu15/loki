@@ -290,23 +290,23 @@ configAnnotations: {}
 
 config:
   enabled: true
-  global: {}
-    # slack_api_url: ''
-
+  global:
+    smtp_smarthost: 'smtp.gmail.com:587'
+    smtp_from: 'your-email@gmail.com'
+    smtp_auth_username: 'your-email@gmail.com'
+    smtp_require_tls: true
   templates:
     - '/etc/alertmanager/*.tmpl'
-
-  receivers:
-    - name: default-receiver
-      # slack_configs:
-      #  - channel: '@you'
-      #    send_resolved: true
-
   route:
     group_wait: 10s
     group_interval: 5m
-    receiver: default-receiver
     repeat_interval: 3h
+    receiver: 'email-notifications'
+  receivers:
+    - name: 'email-notifications'
+      email_configs:
+        - to: 'ragulvishnu.r@gmail.com'
+          send_resolved: true
 
 ## Monitors ConfigMap changes and POSTs to a URL
 ## Ref: https://github.com/prometheus-operator/prometheus-operator/tree/main/cmd/prometheus-config-reloader
