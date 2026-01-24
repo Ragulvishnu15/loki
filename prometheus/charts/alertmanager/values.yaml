@@ -288,13 +288,13 @@ configAnnotations: {}
   ## Example for inject secret
   # slack_api_url: '${vault:secret/data/slack-hook-alerts#URL}'
 secret:
-  smtpAuthPassword: "your-app-password"
+  smtpAuthPassword: "xmgksxlyipubymls"
 config:
   enabled: true
   global:
     smtp_smarthost: 'smtp.gmail.com:587'
-    smtp_from: 'your-email@gmail.com'
-    smtp_auth_username: 'your-email@gmail.com'
+    smtp_from: 'ragulvishnu.r3@gmail.com'
+    smtp_auth_username: 'ragulvishnu.r3@gmail.com'
     smtp_require_tls: true
   templates:
     - '/etc/alertmanager/*.tmpl'
