@@ -203,7 +203,7 @@ server:
   alertmanagers:
     - static_configs:
         - targets:
-            - alert-alertmanager.alert.svc.cluster.local:9093
+            - alertmanager.alert.svc.cluster.local:9093
       scheme: http
       path_prefix: /
       timeout: 10s
