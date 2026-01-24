@@ -287,27 +287,23 @@ configAnnotations: {}
   # vault.security.banzaicloud.io/vault-path: "kubernetes"
   ## Example for inject secret
   # slack_api_url: '${vault:secret/data/slack-hook-alerts#URL}'
-secret:
-  smtpAuthPassword: "xmgksxlyipubymls"
 config:
-  enabled: true
   global:
     smtp_smarthost: 'smtp.gmail.com:587'
     smtp_from: 'ragulvishnu.r3@gmail.com'
     smtp_auth_username: 'ragulvishnu.r3@gmail.com'
+    smtp_auth_password: '{{ .Values.secret.smtpAuthPassword }}'  # ← Template placeholder
     smtp_require_tls: true
-  templates:
-    - '/etc/alertmanager/*.tmpl'
   route:
-    group_wait: 10s
-    group_interval: 5m
-    repeat_interval: 3h
     receiver: 'email-notifications'
   receivers:
     - name: 'email-notifications'
       email_configs:
         - to: 'ragulvishnu.r3@gmail.com'
           send_resolved: true
+
+secret:
+  smtpAuthPassword: "xmgksxlyipubymls"  # ← 16-char App Password (no spaces)
 
 ## Monitors ConfigMap changes and POSTs to a URL
 ## Ref: https://github.com/prometheus-operator/prometheus-operator/tree/main/cmd/prometheus-config-reloader
