@@ -287,8 +287,9 @@ configAnnotations: {}
   # vault.security.banzaicloud.io/vault-path: "kubernetes"
   ## Example for inject secret
   # slack_api_url: '${vault:secret/data/slack-hook-alerts#URL}'
+# Remove the hardcoded secret from your values.yaml
 secret:
-  smtpAuthPassword: "xmgksxlyipubymls"  # ← 16-char App Password (no spaces)
+  # This section should be empty or removed completely
 
 config:
   global:
@@ -296,7 +297,8 @@ config:
     smtp_from: 'ragulvishnu.r3@gmail.com'
     smtp_auth_username: 'ragulvishnu.r3@gmail.com'
     smtp_require_tls: true
-    smtp_auth_password: '{{ .Values.secret.smtpAuthPassword }}'  # ← Template placeholder
+    # Reference the secret properly
+    smtp_auth_password: '{{ .Values.secret.smtpAuthPassword }}'
   route:
     receiver: 'email-notifications'
   receivers:
