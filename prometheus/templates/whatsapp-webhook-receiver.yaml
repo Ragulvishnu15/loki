@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Namespace
-metadata:  # ← FIXED
+metadata:
   name: monitoring-tools
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 ---
 apiVersion: v1
 kind: Secret
-metadata:  # ← FIXED
+metadata:
   name: twilio-credentials
   namespace: monitoring-tools
   annotations:
@@ -21,7 +21,7 @@ stringData:
 ---
 apiVersion: apps/v1
 kind: Deployment
-metadata:  # ← FIXED
+metadata:
   name: whatsapp-webhook-receiver
   namespace: monitoring-tools
   annotations:
@@ -32,53 +32,39 @@ spec:
     matchLabels:
       app: whatsapp-webhook-receiver
   template:
-    metadata:  # ← FIXED (inside Pod template too!)
+    metadata:
       labels:
         app: whatsapp-webhook-receiver
     spec:
       containers:
-      - name: receiver
-        image: node:18-alpine
-        ports:
-        - containerPort: 3000
-        env:
-        - name: TWILIO_ACCOUNT_SID
-          valueFrom:
-            secretKeyRef:
-              name: twilio-credentials
-              key: TWILIO_ACCOUNT_SID
-        - name: TWILIO_AUTH_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: twilio-credentials
-              key: TWILIO_AUTH_TOKEN
-        - name: TWILIO_WHATSAPP_FROM
-          valueFrom:
-            secretKeyRef:
-              name: twilio-credentials
-              key: TWILIO_WHATSAPP_FROM
-        - name: WHATSAPP_TO
-          valueFrom:
-            secretKeyRef:
-              name: twilio-credentials
-              key: WHATSAPP_TO
-        command: ["/bin/sh", "-c"]
-        args:
-        - |
-          apk add --no-cache curl && \
-          curl -sL https://raw.githubusercontent.com/Ragulvishnu15/alert-manager/main/whatsapp-webhook.js > /app/server.js && \
-          npm install twilio express && \
-          node /app/server.js
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: 3000
-          initialDelaySeconds: 5
-          periodSeconds: 5
+        - name: receiver
+          image: node:18-alpine
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - secretRef:
+                name: twilio-credentials
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -e
+              apk add --no-cache curl npm
+              mkdir -p /app
+              cd /app
+              curl -fsSL https://raw.githubusercontent.com/Ragulvishnu15/alert-manager/main/whatsapp-webhook.js -o server.js
+              npm init -y >/dev/null
+              npm install twilio express
+              node server.js
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
 ---
 apiVersion: v1
 kind: Service
-metadata:  # ← FIXED
+metadata:
   name: whatsapp-webhook-receiver
   namespace: monitoring-tools
   annotations:
@@ -87,6 +73,6 @@ spec:
   selector:
     app: whatsapp-webhook-receiver
   ports:
-  - port: 80
-    targetPort: 3000
+    - port: 80
+      targetPort: 3000
   type: ClusterIP
