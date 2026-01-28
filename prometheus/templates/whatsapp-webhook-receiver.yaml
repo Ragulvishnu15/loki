@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Namespace
-metadata:
+meta
   name: monitoring-tools
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 ---
 apiVersion: v1
 kind: Secret
-metadata:
+meta
   name: twilio-credentials
   namespace: monitoring-tools
   annotations:
@@ -21,7 +21,7 @@ stringData:
 ---
 apiVersion: apps/v1
 kind: Deployment
-metadata:
+meta
   name: whatsapp-webhook-receiver
   namespace: monitoring-tools
   annotations:
@@ -32,7 +32,7 @@ spec:
     matchLabels:
       app: whatsapp-webhook-receiver
   template:
-    metadata:
+    meta
       labels:
         app: whatsapp-webhook-receiver
     spec:
@@ -51,7 +51,7 @@ spec:
               apk add --no-cache curl npm
               mkdir -p /app
               cd /app
-              curl -fsSL https://raw.githubusercontent.com/Ragulvishnu15/alert-manager/main/whatsapp-webhook.js -o server.js
+              curl -fsSL https://raw.githubusercontent.com/Ragulvishnu15/cloudtools/main/prometheus/charts/alertmanager/whatsapp-webhook.js -o server.js
               npm init -y >/dev/null
               npm install twilio express
               node server.js
@@ -64,7 +64,7 @@ spec:
 ---
 apiVersion: v1
 kind: Service
-metadata:
+meta
   name: whatsapp-webhook-receiver
   namespace: monitoring-tools
   annotations:
